@@ -21,7 +21,7 @@ class Orchestrator
     /**
      * @var array<CleverAge\Orchestrator\Source\Model\Project>
      */
-    protected $sourceProjects;
+    protected $sourceProjects = array();
 
     public function __construct(TicketingInterface $ticketing = null, SourceInterface $source = null)
     {
