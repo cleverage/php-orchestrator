@@ -4,10 +4,10 @@ namespace CleverAge\Orchestrator\Sources\Gitlab;
 
 use Gitlab\Client;
 use Gitlab\Exception\RuntimeException;
-use CleverAge\Orchestrator\Sources\SourceInterface;
+use CleverAge\Orchestrator\Sources\CachedSource;
 use CleverAge\Orchestrator\Sources\Model;
 
-class Gitlab implements SourceInterface
+class Gitlab extends CachedSource
 {
     /**
      * @var \Gitlab\Client
@@ -17,6 +17,11 @@ class Gitlab implements SourceInterface
     public function __construct(Client $client)
     {
         $this->client = $client;
+    }
+
+    protected function getCachePrefix()
+    {
+        return 'gitlab';
     }
 
     /**
@@ -38,7 +43,7 @@ class Gitlab implements SourceInterface
     /**
      * @inheritdoc
      */
-    public function getProjects()
+    protected function doGetProjects()
     {
         $projectsApi = $this->client->api('projects')->all();
 
@@ -54,7 +59,7 @@ class Gitlab implements SourceInterface
     /**
      * @inheritdoc
      */
-    public function getProject($id)
+    protected function doGetProject($id)
     {
         $projectApi = $this->client->api('projects')->show($id);
 
@@ -64,7 +69,7 @@ class Gitlab implements SourceInterface
     /**
      * @inheritdoc
      */
-    public function getBranch(Model\Project $project, $branch)
+    protected function doGetBranch(Model\Project $project, $branch)
     {
         try {
             $branchApi = $this->client->api('repositories')->branch($project->getId(), $branch);
@@ -84,7 +89,7 @@ class Gitlab implements SourceInterface
     /**
      * @inheritdoc
      */
-    public function getMergeRequests(Model\Project $project, $page = 1, $perPage = 20)
+    protected function doGetMergeRequests(Model\Project $project, $page = 1, $perPage = 20)
     {
         $mrsApi = $this->client->api('merge_requests')->all($project->getId(), $page, $perPage);
 

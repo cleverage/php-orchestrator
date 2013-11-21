@@ -2,11 +2,11 @@
 
 namespace CleverAge\Orchestrator\Ticketing\Trac;
 
-use CleverAge\Orchestrator\Ticketing\TicketingInterface;
+use CleverAge\Orchestrator\Ticketing\CachedTicketing;
 use CleverAge\Orchestrator\Ticketing\Model;
 use CleverAge\Trac\TracApi;
 
-class Trac implements TicketingInterface
+class Trac extends CachedTicketing
 {
     /**
      * @var TracApi
@@ -18,6 +18,11 @@ class Trac implements TicketingInterface
         $this->trac = $trac;
     }
 
+    protected function getCachePrefix()
+    {
+        return 'trac';
+    }
+
     public function getUrlFor($object)
     {
         if ($object instanceof Model\Ticket) {
@@ -27,14 +32,14 @@ class Trac implements TicketingInterface
         return '';
     }
 
-    public function getTicketById($id)
+    protected function doGetTicketById($id)
     {
         $ticketApi = $this->trac->getTicketById($id);
 
         return Converters::convertTicketFromTrac($ticketApi);
     }
 
-    public function getTicketListByStatus($status, $limit = 20)
+    protected function doGetTicketListByStatus($status, $limit = 20)
     {
         $ticketsApi = $this->trac->getTicketListByStatus($status, $limit);
         $tickets = array();

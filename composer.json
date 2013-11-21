@@ -13,7 +13,8 @@
         "psr-0": { "CleverAge\\Orchestrator": "src/" }
     },
     "require": {
-        "php": ">=5.3"
+        "php": ">=5.3",
+        "doctrine/cache": "v1.3.0"
     },
     "suggest": {
         "cleverage/php-trac": "dev-master",
