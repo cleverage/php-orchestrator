@@ -14,5 +14,5 @@ interface TicketingInterface
 
     public function getTicketById($id);
 
-    public function getTicketListByStatus($status, $limit);
+    public function getTicketListByStatus($status, $limit, $offset = 0);
 }

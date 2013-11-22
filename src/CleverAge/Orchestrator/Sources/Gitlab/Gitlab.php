@@ -25,6 +25,11 @@ class Gitlab extends CachedSource
         return 'gitlab';
     }
 
+    protected function getPage($limit, $offset)
+    {
+        return ((int) $offset/$limit)+1;
+    }
+
     /**
      * @inheritdoc
      */
@@ -44,14 +49,17 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    protected function doGetProjects()
+    protected function doGetProjects(array $ids = array())
     {
         $projectsApi = $this->client->api('projects')->all();
 
         $projects = array();
 
         foreach ($projectsApi as $projectApi) {
-            $projects[] = Converters::convertProjectFromApi($projectApi);
+            $project = Converters::convertProjectFromApi($projectApi);
+            if (in_array($project->getId(), $ids)) {
+                $projects[] = $project;
+            }
         }
 
         return $projects;
@@ -90,9 +98,11 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    protected function doGetMergeRequests(Model\Project $project, $page = 1, $perPage = 20)
+    protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0)
     {
-        $mrsApi = $this->client->api('merge_requests')->all($project->getId(), $page, $perPage);
+        $page = $this->getPage($limit, $offset);
+
+        $mrsApi = $this->client->api('merge_requests')->all($project->getId(), $page, $limit);
 
         $mrs = array();
 

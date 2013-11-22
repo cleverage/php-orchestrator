@@ -29,11 +29,30 @@ class Orchestrator
         $this->source = $source;
     }
 
+    public function fetchSourcesProjects(array $ids)
+    {
+        if ($this->source && !empty($ids)) {
+            $this->setSourcesProjects(
+                $this->source->getProjects($ids)
+            );
+        }
+
+        return $this;
+    }
+
     public function setSourcesProjects(array $projects)
     {
         $this->sourceProjects = $projects;
 
         return $this;
+    }
+
+    /**
+     * @return array<CleverAge\Orchestrator\Source\Model\Project>
+     */
+    public function getSourcesProjects()
+    {
+        return $this->sourceProjects;
     }
 
     public function getTicketWithSources(Request $request)

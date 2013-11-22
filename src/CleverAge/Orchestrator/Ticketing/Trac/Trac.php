@@ -40,7 +40,7 @@ class Trac extends CachedTicketing
         return Converters::convertTicketFromTrac($ticketApi);
     }
 
-    protected function doGetTicketListByStatus($status, $limit = 20)
+    protected function doGetTicketListByStatus($status, $limit = 20, $offset = 0)
     {
         $ticketsApi = $this->trac->getTicketListByStatus($status, $limit);
         $tickets = array();

@@ -13,9 +13,12 @@ interface SourceInterface
     public function getUrlFor(Urlisable $object);
 
     /**
+     * Returns list of project using ids provided (all if no ids).
+     * 
+     * @param array $ids
      * @return array<CleverAge\Orchestrator\Sources\Model\Project>
      */
-    public function getProjects();
+    public function getProjects(array $ids = array());
 
     /**
      * @param int $id

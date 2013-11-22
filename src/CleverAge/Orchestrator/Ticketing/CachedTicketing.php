@@ -29,20 +29,21 @@ abstract class CachedTicketing extends CacheCapable implements TicketingInterfac
     abstract protected function doGetTicketById($id);
 
     /**
-     *
      * @param string $status
      * @param int $limit
+     * @param int $offset
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
-    public function getTicketListByStatus($status, $limit = 20)
+    public function getTicketListByStatus($status, $limit = 20, $offset = 0)
     {
-        return $this->getCachedRessource('ticketss_'.$status.'_'.$limit, 'doGetTicketListByStatus', func_get_args(), 'ticket');
+        return $this->getCachedRessource('tickets_'.$status.'_'.$limit.'_'.$offset, 'doGetTicketListByStatus', func_get_args(), 'ticket');
     }
+
     /**
-     *
      * @param string $status
      * @param int $limit
+     * @param int $offset
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
-    abstract protected function doGetTicketListByStatus($status, $limit = 20);
+    abstract protected function doGetTicketListByStatus($status, $limit = 20, $offset = 0);
 }

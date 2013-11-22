@@ -10,7 +10,7 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      * @var array
      */
     protected $cacheLifetime = array(
-        'project'       => 3600,
+        'project'       => 86400,
         'branch'        => 300,
         'merge_requst'  => 60,
     );
@@ -18,15 +18,17 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
     /**
      * @return array<Model\Project>
      */
-    public function getProjects()
+    public function getProjects(array $ids = array())
     {
-        return $this->getCachedRessource('projects', 'doGetProjects', array(), 'project');
+        sort($ids);
+        $key = 'projects'.(empty($ids) ? '' : '_'.implode('-', $ids));
+        return $this->getCachedRessource($key, 'doGetProjects', func_get_args(), 'project');
     }
 
     /**
      * @return array<Model\Project>
      */
-    abstract protected function doGetProjects();
+    abstract protected function doGetProjects(array $ids = array());
 
     /**
      * @return Model\Project
@@ -49,7 +51,7 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      */
     public function getBranch(Model\Project $project, $id)
     {
-        return $this->getCachedRessource('branch_'.$id, 'doGetBranch', func_get_args(), 'branch');
+        return $this->getCachedRessource('branch_'.$project->getId().'_'.$id, 'doGetBranch', func_get_args(), 'branch');
     }
 
     /**
@@ -65,9 +67,9 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      * @param integer       $perPage
      * @return array<Model\MergeRequest>
      */
-    public function getMergeRequests(Model\Project $project, $page = 1, $perPage = 20)
+    public function getMergeRequests(Model\Project $project, $limit = 20, $offset = 0)
     {
-        return $this->getCachedRessource('mergerequests', 'doGetMergeRequests', func_get_args(), 'mergerequest');
+        return $this->getCachedRessource('mergerequests_'.$project->getId().'_'.$limit.'_'.$offset, 'doGetMergeRequests', func_get_args(), 'mergerequest');
     }
 
     /**
@@ -76,5 +78,5 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      * @param integer       $perPage
      * @return array<Model\MergeRequest>
      */
-    abstract protected function doGetMergeRequests(Model\Project $project, $page = 1, $perPage = 20);
+    abstract protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0);
 }
