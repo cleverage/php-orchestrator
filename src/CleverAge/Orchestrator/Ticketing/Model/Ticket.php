@@ -2,7 +2,9 @@
 
 namespace CleverAge\Orchestrator\Ticketing\Model;
 
-class Ticket
+use CleverAge\Orchestrator\Model\Urlisable;
+
+class Ticket implements Urlisable
 {
     protected $id;
     protected $title;

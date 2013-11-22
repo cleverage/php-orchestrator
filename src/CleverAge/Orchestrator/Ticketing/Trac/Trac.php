@@ -2,6 +2,7 @@
 
 namespace CleverAge\Orchestrator\Ticketing\Trac;
 
+use CleverAge\Orchestrator\Model\Urlisable;
 use CleverAge\Orchestrator\Ticketing\CachedTicketing;
 use CleverAge\Orchestrator\Ticketing\Model;
 use CleverAge\Trac\TracApi;
@@ -23,7 +24,7 @@ class Trac extends CachedTicketing
         return 'trac';
     }
 
-    public function getUrlFor($object)
+    public function getUrlFor(Urlisable $object)
     {
         if ($object instanceof Model\Ticket) {
             return $object->getUrl();

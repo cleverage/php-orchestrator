@@ -2,13 +2,15 @@
 
 namespace CleverAge\Orchestrator\Sources;
 
+use CleverAge\Orchestrator\Model\Urlisable;
+
 interface SourceInterface
 {
     /**
-     * @param mixed object from CleverAge\Orchestrator\Sources\Model\*
+     * @param CleverAge\Orchestrator\Model\Urlisable $object
      * @return string
      */
-    public function getUrlFor($object);
+    public function getUrlFor(Urlisable $object);
 
     /**
      * @return array<CleverAge\Orchestrator\Sources\Model\Project>

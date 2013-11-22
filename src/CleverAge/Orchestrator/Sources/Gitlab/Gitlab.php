@@ -4,6 +4,7 @@ namespace CleverAge\Orchestrator\Sources\Gitlab;
 
 use Gitlab\Client;
 use Gitlab\Exception\RuntimeException;
+use CleverAge\Orchestrator\Model\Urlisable;
 use CleverAge\Orchestrator\Sources\CachedSource;
 use CleverAge\Orchestrator\Sources\Model;
 
@@ -27,7 +28,7 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    public function getUrlFor($object)
+    public function getUrlFor(Urlisable $object)
     {
         if ($object instanceof Model\Project) {
             return $object->getUrl();

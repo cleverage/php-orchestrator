@@ -2,8 +2,9 @@
 
 namespace CleverAge\Orchestrator\Sources\Model;
 
+use CleverAge\Orchestrator\Model\Urlisable;
 
-class Branch
+class Branch implements Urlisable
 {
     protected $name;
 

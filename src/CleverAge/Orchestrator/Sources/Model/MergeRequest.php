@@ -2,8 +2,9 @@
 
 namespace CleverAge\Orchestrator\Sources\Model;
 
+use CleverAge\Orchestrator\Model\Urlisable;
 
-class MergeRequest
+class MergeRequest implements Urlisable
 {
     const STATE_OPENED = 'opened';
     const STATE_MERGED = 'merged';
