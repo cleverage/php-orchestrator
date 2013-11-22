@@ -2,6 +2,7 @@
 
 namespace CleverAge\Orchestrator\Ticketing\Trac;
 
+use CleverAge\Orchestrator\Request\Request;
 use CleverAge\Orchestrator\Model\Urlisable;
 use CleverAge\Orchestrator\Ticketing\CachedTicketing;
 use CleverAge\Orchestrator\Ticketing\Model;
@@ -40,9 +41,9 @@ class Trac extends CachedTicketing
         return Converters::convertTicketFromTrac($ticketApi);
     }
 
-    protected function doGetTicketListByStatus($status, $limit = 20, $offset = 0)
+    protected function doGetTicketList(Request $request)
     {
-        $ticketsApi = $this->trac->getTicketListByStatus($status, $limit);
+        $ticketsApi = $this->trac->getTicketListByStatus($request->getStatus(), $request->getLimit(), $request->getOffset());
         $tickets = array();
 
         foreach ($ticketsApi as $ticketApi) {

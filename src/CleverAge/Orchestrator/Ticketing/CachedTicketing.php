@@ -3,6 +3,7 @@
 namespace CleverAge\Orchestrator\Ticketing;
 
 use CleverAge\Orchestrator\Cache\CacheCapable;
+use CleverAge\Orchestrator\Request\Request;
 
 abstract class CachedTicketing extends CacheCapable implements TicketingInterface
 {
@@ -29,21 +30,17 @@ abstract class CachedTicketing extends CacheCapable implements TicketingInterfac
     abstract protected function doGetTicketById($id);
 
     /**
-     * @param string $status
-     * @param int $limit
-     * @param int $offset
+     * @param CleverAge\Orchestrator\Request\Request                $request
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
-    public function getTicketListByStatus($status, $limit = 20, $offset = 0)
+    public function getTicketList(Request $request)
     {
-        return $this->getCachedRessource('tickets_'.$status.'_'.$limit.'_'.$offset, 'doGetTicketListByStatus', func_get_args(), 'ticket');
+        return $this->getCachedRessource('tickets_'.$request->getHash(), 'doGetTicketList', func_get_args(), 'ticket');
     }
 
     /**
-     * @param string $status
-     * @param int $limit
-     * @param int $offset
+     * @param CleverAge\Orchestrator\Request\Request                $request
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
-    abstract protected function doGetTicketListByStatus($status, $limit = 20, $offset = 0);
+    abstract protected function doGetTicketList(Request $request);
 }

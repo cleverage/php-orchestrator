@@ -57,7 +57,7 @@ class Orchestrator
 
     public function getTicketWithSources(Request $request)
     {
-        $tickets = $this->ticketing->getTicketListByStatus($request->getStatus());
+        $tickets = $this->ticketing->getTicketList($request);
 
         $features = array();
 
