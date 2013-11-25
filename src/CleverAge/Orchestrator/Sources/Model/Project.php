@@ -3,8 +3,9 @@
 namespace CleverAge\Orchestrator\Sources\Model;
 
 use CleverAge\Orchestrator\Model\Urlisable;
+use CleverAge\Orchestrator\Model\RawData;
 
-class Project implements Urlisable
+class Project extends RawData implements Urlisable
 {
     protected $id;
     protected $name;

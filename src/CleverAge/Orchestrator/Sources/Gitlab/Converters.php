@@ -10,6 +10,7 @@ class Converters
     {
         $p = new Model\Project();
         $p
+            ->setRaw($projectApi)
             ->setId($projectApi['id'])
             ->setName($projectApi['name'])
             ->setDescription($projectApi['description'])
@@ -24,6 +25,7 @@ class Converters
     {
         $b = new Model\Branch();
         $b
+            ->setRaw($branchApi)
             ->setName($branchApi['name'])
             ->setLastCommit(self::convertCommitFromApi($branchApi['commit']))
         ;
@@ -63,6 +65,7 @@ class Converters
         }
 
         $mr
+            ->setRaw($mrApi)
             ->setId($mrApi['iid'])
             ->setGlobalId($mrApi['id'])
             ->setName($mrApi['title'])

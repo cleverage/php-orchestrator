@@ -3,8 +3,9 @@
 namespace CleverAge\Orchestrator\Ticketing\Model;
 
 use CleverAge\Orchestrator\Model\Urlisable;
+use CleverAge\Orchestrator\Model\RawData;
 
-class Ticket implements Urlisable
+class Ticket extends RawData implements Urlisable
 {
     protected $id;
     protected $title;

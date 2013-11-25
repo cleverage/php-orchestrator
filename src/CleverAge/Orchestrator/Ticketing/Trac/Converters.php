@@ -11,6 +11,7 @@ class Converters
     {
         $t = new Model\Ticket();
         $t
+            ->setRaw($ticket)
             ->setId($ticket->get('id'))
             ->setTitle($ticket->get('summary'))
             ->setDescription($ticket->get('description'))
