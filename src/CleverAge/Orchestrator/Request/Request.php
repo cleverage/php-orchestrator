@@ -2,6 +2,9 @@
 
 namespace CleverAge\Orchestrator\Request;
 
+use CleverAge\Orchestrator\Model\HashUniqId;
+use CleverAge\Orchestrator\Ticketing\Model\Milestone;
+
 class Request
 {
     /**
@@ -10,7 +13,7 @@ class Request
     protected $status;
 
     /**
-     * @var mixed
+     * @var Orchestrator\Ticketing\Model\Milestone
      */
     protected $milestone;
 
@@ -34,6 +37,9 @@ class Request
         return $this->status;
     }
 
+    /**
+     * @return CleverAge\Orchestrator\Ticketing\Model\Milestone
+     */
     public function getMilestone()
     {
         return $this->milestone;
@@ -75,7 +81,7 @@ class Request
         return $this;
     }
 
-    public function setMilestone($milestone)
+    public function setMilestone(Milestone $milestone)
     {
         $this->milestone = $milestone;
         return $this;
@@ -109,6 +115,8 @@ class Request
                 $value = $v ? '1':'0';
             } elseif (is_array($v)) {
                 $value = implode('-', $v);
+            } elseif ($v instanceof HashUniqId) {
+                $value = $v->getHashUniqId();
             }
 
             if ($value) {

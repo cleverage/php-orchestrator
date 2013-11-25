@@ -12,6 +12,7 @@ abstract class CachedTicketing extends CacheCapable implements TicketingInterfac
      */
     protected $cacheLifetime = array(
         'ticket'        => 120,
+        'milestone'    => 86400,
     );
 
     /**
@@ -43,4 +44,23 @@ abstract class CachedTicketing extends CacheCapable implements TicketingInterfac
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
     abstract protected function doGetTicketList(Request $request);
+
+    /**
+     * @param boolean\null $completed if null, all milestones, if false, actives, finished otherwise
+     * @return array<CleverAge\Orchestrator\Ticketing\Model\Milestone>
+     */
+    public function getMilestones($completed = null)
+    {
+        $c = '';
+        if (!is_null($completed)) {
+            $c = $completed ? '_completed' : '_not_completed';
+        }
+        return $this->getCachedRessource('milestones' . $c, 'doGetMilstones', func_get_args(), 'milestone');
+    }
+
+    /**
+     * @param boolean\null $completed if null, all milestones, if false, actives, finished otherwise
+     * @return array<CleverAge\Orchestrator\Ticketing\Model\Milestone>
+     */
+    abstract protected function doGetMilstones($completed = null);
 }

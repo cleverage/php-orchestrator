@@ -24,4 +24,9 @@ interface TicketingInterface
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
     public function getTicketList(Request $request);
+
+    /**
+     * @return array<string>
+     */
+    public function getMilestones();
 }

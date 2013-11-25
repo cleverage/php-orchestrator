@@ -83,4 +83,9 @@ class Orchestrator
 
         return $features;
     }
+
+    public function getMilestones($completed = null)
+    {
+        return $this->ticketing->getMilestones($completed);
+    }
 }

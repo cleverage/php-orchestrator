@@ -2,7 +2,8 @@
 
 namespace CleverAge\Orchestrator\Ticketing\Trac;
 
-use CleverAge\Trac\Ticket;
+use CleverAge\Trac\Model\Ticket;
+use CleverAge\Trac\Model\Milestone;
 use CleverAge\Orchestrator\Ticketing\Model;
 
 class Converters
@@ -33,5 +34,19 @@ class Converters
             $t->setBlockedBy(explode(', ', $blockedBy));
         }
         return $t;
+    }
+
+    public static function convertMilestoneFromTrac(Milestone $milestone)
+    {
+        $m = new Model\Milestone();
+        $m
+            ->setCompletedAt($milestone->get('completed') instanceof \DateTime ? $milestone->get('completed') : null)
+            ->setDescription($milestone->get('description'))
+            ->setName($milestone->get('name'))
+            ->setEndAt($milestone->get('due') instanceof \DateTime ? $milestone->get('due') : null)
+            ->setRaw($milestone)
+        ;
+
+        return $m;
     }
 }
