@@ -20,7 +20,7 @@ class Trac extends CachedTicketing
         $this->trac = $trac;
     }
 
-    protected function getCachePrefix()
+    public function getName()
     {
         return 'trac';
     }

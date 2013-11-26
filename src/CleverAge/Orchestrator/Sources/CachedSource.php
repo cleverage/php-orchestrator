@@ -2,9 +2,9 @@
 
 namespace CleverAge\Orchestrator\Sources;
 
-use CleverAge\Orchestrator\Cache\CacheCapable;
+use CleverAge\Orchestrator\Service\CachedService;
 
-abstract class CachedSource extends CacheCapable implements SourceInterface
+abstract class CachedSource extends CachedService implements SourceInterface
 {
     /**
      * @var array
@@ -22,7 +22,10 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
     {
         sort($ids);
         $key = 'projects'.(empty($ids) ? '' : '_'.implode('-', $ids));
-        return $this->getCachedRessource($key, 'doGetProjects', func_get_args(), 'project');
+        return $this->getResource('doGetProjects', func_get_args(), array(
+            'cache_key' => $key,
+            'cache_lifetime' => $this->cacheLifetime['project']
+        ));
     }
 
     /**
@@ -35,7 +38,10 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      */
     public function getProject($id)
     {
-        return $this->getCachedRessource('project_'.$id, 'doGetProject', func_get_args(), 'project');
+        return $this->getResource('doGetProject', func_get_args(), array(
+            'cache_key' => 'project_'.$id,
+            'cache_lifetime' => $this->cacheLifetime['project']
+        ));
     }
 
     /**
@@ -51,7 +57,10 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      */
     public function getBranch(Model\Project $project, $id)
     {
-        return $this->getCachedRessource('branch_'.$project->getId().'_'.$id, 'doGetBranch', func_get_args(), 'branch');
+        return $this->getResource('doGetBranch', func_get_args(), array(
+            'cache_key' => 'branch_'.$project->getId().'_'.$id,
+            'cache_lifetime' => $this->cacheLifetime['branch']
+        ));
     }
 
     /**
@@ -69,7 +78,10 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      */
     public function getMergeRequests(Model\Project $project, $limit = 20, $offset = 0)
     {
-        return $this->getCachedRessource('mergerequests_'.$project->getId().'_'.$limit.'_'.$offset, 'doGetMergeRequests', func_get_args(), 'mergerequest');
+        return $this->getResource('doGetMergeRequests', func_get_args(), array(
+            'cache_key' => 'mergerequests_'.$project->getId().'_'.$limit.'_'.$offset,
+            'cache_lifetime' => $this->cacheLifetime['mergerequest']
+        ));
     }
 
     /**
@@ -79,4 +91,12 @@ abstract class CachedSource extends CacheCapable implements SourceInterface
      * @return array<Model\MergeRequest>
      */
     abstract protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0);
+
+    /**
+     * @inheritdoc
+     */
+    protected function fetchResource($method, $arguments)
+    {
+        return call_user_func_array(array($this, $method), $arguments);
+    }
 }

@@ -20,7 +20,7 @@ class Gitlab extends CachedSource
         $this->client = $client;
     }
 
-    protected function getCachePrefix()
+    public function getName()
     {
         return 'gitlab';
     }
