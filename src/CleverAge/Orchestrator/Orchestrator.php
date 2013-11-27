@@ -5,6 +5,8 @@ namespace CleverAge\Orchestrator;
 use CleverAge\Orchestrator\Request\Request;
 use CleverAge\Orchestrator\Sources\SourceInterface;
 use CleverAge\Orchestrator\Ticketing\TicketingInterface;
+use CleverAge\Orchestrator\Ticketing\Model\Ticket;
+use CleverAge\Orchestrator\Feature;
 
 class Orchestrator
 {
@@ -55,6 +57,31 @@ class Orchestrator
         return $this->sourceProjects;
     }
 
+    /**
+     * @param \CleverAge\Orchestrator\Ticketing\Model\Ticket $ticket
+     * @param \CleverAge\Orchestrator\Request\Request $request
+     * @return \CleverAge\Orchestrator\Feature
+     */
+    protected function buildFeature(Ticket $ticket, Request $request)
+    {
+        $sources = array();
+
+        if ($this->source) {
+            $sourceIdClosure = $request->getSourceIdClosure();
+            foreach ($this->sourceProjects as $project) {
+                $sourceIds = $sourceIdClosure($ticket);
+                foreach ($sourceIds as $sourceId) {
+                    $source = $this->source->getBranch($project, $sourceId);
+                    if (!empty($source)) {
+                        $sources[] = $source;
+                    }
+                }
+            }
+        }
+
+        return new Feature($ticket, $sources);
+    }
+
     public function getTicketWithSources(Request $request)
     {
         $tickets = $this->ticketing->getTicketList($request);
@@ -62,23 +89,7 @@ class Orchestrator
         $features = array();
 
         foreach ($tickets as $ticket) {
-
-            $sources = array();
-
-            if ($this->source) {
-                $sourceIdClosure = $request->getSourceIdClosure();
-                foreach ($this->sourceProjects as $project) {
-                    $sourceIds = $sourceIdClosure($ticket);
-                    foreach ($sourceIds as $sourceId) {
-                        $source = $this->source->getBranch($project, $sourceId);
-                        if (!empty($source)) {
-                            $sources[] = $source;
-                        }
-                    }
-                }
-            }
-
-            $features[] = new Feature($ticket, $sources);
+            $features[] = $this->buildFeature($ticket, $request);
         }
 
         return $features;

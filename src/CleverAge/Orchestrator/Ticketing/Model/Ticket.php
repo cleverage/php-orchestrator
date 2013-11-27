@@ -159,4 +159,27 @@ class Ticket extends RawData implements Urlisable
         $this->url = $url;
         return $this;
     }
+
+    /**
+     * @param array<CleverAge\Orchestrator\Ticketing\Model\Ticket> $blockingStatus
+     * @return boolean
+     */
+    public function hasBlocking(array $blockingStatus)
+    {
+        foreach ($this->blocking as $blocking) {
+            if ($blocking->isBlocking($blockingStatus)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<CleverAge\Orchestrator\Ticketing\Model\Ticket> $blockingStatus
+     * @return boolean
+     */
+    public function isBlocking(array $blockingStatus)
+    {
+        return in_array($this->getStatus(), $blockingStatus);
+    }
 }

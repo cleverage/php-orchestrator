@@ -30,7 +30,7 @@ class Converters
             $t->setBlocking(explode(', ', $blocking));
         }
         $blockedBy = $ticket->get('blockedby');
-        if (!empty($blocking)) {
+        if (!empty($blockedBy)) {
             $t->setBlockedBy(explode(', ', $blockedBy));
         }
         return $t;

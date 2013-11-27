@@ -48,11 +48,34 @@ class Trac extends CachedTicketing
         return $filters;
     }
 
+    public function getTicketById($id)
+    {
+        $ticket = parent::getTicketById($id);
+
+        $this->populateBlocking($ticket);
+
+        return $ticket;
+    }
+
     protected function doGetTicketById($id)
     {
+        if (empty($id)) {
+            return null;
+        }
         $ticketApi = $this->trac->getTicketById($id);
 
         return Converters::convertTicketFromTrac($ticketApi);
+    }
+
+    public function getTicketList(Request $request)
+    {
+        $tickets = parent::getTicketList($request);
+
+        foreach ($tickets as $ticket) {
+            $this->populateBlocking($ticket);
+        }
+
+        return $tickets;
     }
 
     protected function doGetTicketList(Request $request)
@@ -81,5 +104,19 @@ class Trac extends CachedTicketing
         }
 
         return $milestones;
+    }
+
+    protected function populateBlocking(Model\Ticket $ticket = null)
+    {
+        if ($ticket) {
+            $blocking = array();
+            foreach ($ticket->getBlocking() as $id) {
+                if (!empty($id)) {
+                    $blocking[] = $this->getTicketById($id);
+                }
+            }
+
+            $ticket->setBlocking($blocking);
+        }
     }
 }
