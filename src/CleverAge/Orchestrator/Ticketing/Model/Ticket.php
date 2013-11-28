@@ -17,6 +17,7 @@ class Ticket extends RawData implements Urlisable
     protected $owner;
     protected $priority;
     protected $url;
+    protected $closed;
 
     /**
      * @var array
@@ -86,6 +87,16 @@ class Ticket extends RawData implements Urlisable
     public function getUrl()
     {
         return $this->url;
+    }
+
+    public function isClosed()
+    {
+        return $this->closed;
+    }
+
+    public function isOpened()
+    {
+        return !$this->isClosed();
     }
 
     public function setId($id)
@@ -160,6 +171,12 @@ class Ticket extends RawData implements Urlisable
         return $this;
     }
 
+    public function setIsClosed($closed)
+    {
+        $this->closed = $closed;
+        return $this;
+    }
+
     /**
      * @param array<CleverAge\Orchestrator\Ticketing\Model\Ticket> $blockingStatus
      * @return boolean
@@ -167,11 +184,17 @@ class Ticket extends RawData implements Urlisable
     public function hasBlocking(array $blockingStatus)
     {
         foreach ($this->blocking as $blocking) {
-            if ($blocking->isBlocking($blockingStatus)) {
+            if ($blocking->hasBlockingStatus($blockingStatus) || $blocking->isBlocking($blockingStatus)) {
                 return true;
             }
         }
+
         return false;
+    }
+
+    public function hasBlockingStatus(array $blockingStatus)
+    {
+        return in_array($this->getStatus(), $blockingStatus);
     }
 
     /**
@@ -180,6 +203,10 @@ class Ticket extends RawData implements Urlisable
      */
     public function isBlocking(array $blockingStatus)
     {
-        return in_array($this->getStatus(), $blockingStatus);
+        if (!$this->hasBlockingStatus($blockingStatus)) {
+            return false;
+        }
+
+        return $this->hasBlocking($blockingStatus);
     }
 }

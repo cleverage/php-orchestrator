@@ -4,6 +4,7 @@ namespace CleverAge\Orchestrator\Ticketing\Trac;
 
 use CleverAge\Trac\Model\Ticket;
 use CleverAge\Trac\Model\Milestone;
+use CleverAge\Trac\TracApi;
 use CleverAge\Orchestrator\Ticketing\Model;
 
 class Converters
@@ -23,6 +24,7 @@ class Converters
             ->setOwner($ticket->get('owner'))
             ->setPriority($ticket->get('priority'))
             ->setUrl($ticket->getUrl())
+            ->setIsClosed($ticket->get('status') == TracApi::STATUS_CLOSED)
         ;
 
         $blocking = $ticket->get('blocking');

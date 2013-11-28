@@ -52,7 +52,16 @@ class Trac extends CachedTicketing
     {
         $ticket = parent::getTicketById($id);
 
-        $this->populateBlocking($ticket);
+        $this->populateDependencies($ticket, $populated = array());
+
+        return $ticket;
+    }
+
+    protected function getPopulatedDependenciesById($id, array &$populated = array())
+    {
+        $ticket = parent::getTicketById($id);
+
+        $this->populateDependencies($ticket, $populated);
 
         return $ticket;
     }
@@ -71,8 +80,9 @@ class Trac extends CachedTicketing
     {
         $tickets = parent::getTicketList($request);
 
+        $populated = array();
         foreach ($tickets as $ticket) {
-            $this->populateBlocking($ticket);
+            $this->populateDependencies($ticket, $populated);
         }
 
         return $tickets;
@@ -106,17 +116,29 @@ class Trac extends CachedTicketing
         return $milestones;
     }
 
-    protected function populateBlocking(Model\Ticket $ticket = null)
+    protected function populateDependencies(Model\Ticket $ticket = null, array &$populated = array())
     {
         if ($ticket) {
-            $blocking = array();
-            foreach ($ticket->getBlocking() as $id) {
-                if (!empty($id)) {
-                    $blocking[] = $this->getTicketById($id);
-                }
-            }
+            if (!isset($populated[$ticket->getId()])) {
 
-            $ticket->setBlocking($blocking);
+                $populated[$ticket->getId()] = true;
+
+                $blocking = array();
+                foreach ($ticket->getBlocking() as $id) {
+                    if (!empty($id)) {
+                        $blocking[] = $this->getPopulatedDependenciesById($id, $populated);
+                    }
+                }
+                $ticket->setBlocking($blocking);
+
+                $blockedBy = array();
+                foreach ($ticket->getBlockedBy() as $id) {
+                    if (!empty($id)) {
+                        $blockedBy[] = $this->getPopulatedDependenciesById($id, $populated);
+                    }
+                }
+                $ticket->setBlockedBy($blockedBy);
+            }
         }
     }
 }

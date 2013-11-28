@@ -27,8 +27,10 @@ class Sorter extends \atoum
         $t1_8 = new Ticket();
         $t1_8->setId('1_8')->setStatus('a');
 
-        $t1_5->setBlocking(array($t1_3, $t1_4));
+        $t1_5->setBlocking(array($t1_3, $t1_4))->setBlockedBy(array($t1_8));
         $t1_8->setBlocking(array($t1_3, $t1_5));
+        $t1_3->setBlockedBy(array($t1_5, $t1_8));
+        $t1_4->setBlockedBy(array($t1_5));
         $features[] = $feature_1_5 = new Feature($t1_5);
         $features[] = $feature_1_3 = new Feature($t1_3);
 
@@ -41,6 +43,7 @@ class Sorter extends \atoum
         $t2_5->setId('2_5')->setStatus('s');
 
         $t2_3->setBlocking(array($t2_5));
+        $t2_5->setBlockedBy(array($t2_3));
         $features[] = $feature_2_5 = new Feature($t2_5);
         $features[] = $feature_2_3 = new Feature($t2_3);
 
