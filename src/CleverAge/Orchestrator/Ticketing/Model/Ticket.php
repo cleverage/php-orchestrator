@@ -178,7 +178,7 @@ class Ticket extends RawData implements Urlisable
     }
 
     /**
-     * @param array<CleverAge\Orchestrator\Ticketing\Model\Ticket> $blockingStatus
+     * @param array $blockingStatus
      * @return boolean
      */
     public function hasBlocking(array $blockingStatus)
@@ -198,7 +198,7 @@ class Ticket extends RawData implements Urlisable
     }
 
     /**
-     * @param array<CleverAge\Orchestrator\Ticketing\Model\Ticket> $blockingStatus
+     * @param array $blockingStatus
      * @return boolean
      */
     public function isBlocking(array $blockingStatus)
@@ -208,5 +208,20 @@ class Ticket extends RawData implements Urlisable
         }
 
         return $this->hasBlocking($blockingStatus);
+    }
+
+    /**
+     * @param array $blockingStatus
+     * @return boolean
+     */
+    public function isBlocked(array $blockingStatus)
+    {
+        foreach ($this->getBlockedBy() as $blockedBy) {
+            if ($blockedBy->hasBlockingStatus($blockingStatus) || $blockedBy->isBlocked($blockingStatus)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
