@@ -25,6 +25,9 @@ class Converters
             ->setPriority($ticket->get('priority'))
             ->setUrl($ticket->getUrl())
             ->setIsClosed($ticket->get('status') == TracApi::STATUS_CLOSED)
+            ->setProviderSpecific(array(
+                '_ts' => $ticket->get('_ts'),
+            ))
         ;
 
         $blocking = $ticket->get('blocking');

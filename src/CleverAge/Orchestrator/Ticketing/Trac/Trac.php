@@ -52,7 +52,8 @@ class Trac extends CachedTicketing
     {
         $ticket = parent::getTicketById($id);
 
-        $this->populateDependencies($ticket, $populated = array());
+        $populated = array();
+        $this->populateDependencies($ticket, $populated);
 
         return $ticket;
     }
@@ -72,6 +73,20 @@ class Trac extends CachedTicketing
             return null;
         }
         $ticketApi = $this->trac->getTicketById($id);
+
+        return Converters::convertTicketFromTrac($ticketApi);
+    }
+
+    protected function doUpdateTicket(Model\Ticket $ticket, Model\TicketUpdate $update)
+    {
+        $ticketApi = $this->trac->updateTicket(
+            $ticket->getId(),
+            $update->getUpdatedData(),
+            $update->getComment(),
+            $update->getNotify(),
+            $update->getAuthor(),
+            $update->getUpdatedAt()
+        );
 
         return Converters::convertTicketFromTrac($ticketApi);
     }

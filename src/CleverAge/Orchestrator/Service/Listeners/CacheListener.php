@@ -22,10 +22,13 @@ class CacheListener
     public function onServicePreFetch(ServiceEvent $event)
     {
         $params = $event->getParameters();
-        $cacheKey = isset($params['cache_key']) ? $event->getService()->getName().'_'.$params['cache_key'] : false;
 
-        if ($cacheKey && $this->cache->contains($cacheKey)) {
-            $event->setResource($this->cache->fetch($cacheKey));
+        if (!isset($params['cache_no_get']) || !$params['cache_no_get']) {
+            $cacheKey = isset($params['cache_key']) ? $event->getService()->getName().'_'.$params['cache_key'] : false;
+
+            if ($cacheKey && $this->cache->contains($cacheKey)) {
+                $event->setResource($this->cache->fetch($cacheKey));
+            }
         }
     }
 

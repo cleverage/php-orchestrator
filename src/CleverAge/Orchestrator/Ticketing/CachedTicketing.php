@@ -44,6 +44,31 @@ abstract class CachedTicketing extends CachedService implements TicketingInterfa
     abstract protected function doGetTicketById($id);
 
     /**
+     * Update a ticket from TicketUpdate data
+     *
+     * @param \CleverAge\Orchestrator\Ticketing\Model\Ticket $ticket
+     * @param \CleverAge\Orchestrator\Ticketing\Model\TicketUpdate $update
+     * @return \CleverAge\Orchestrator\Ticketing\Model\Ticket
+     */
+    public function updateTicket(Model\Ticket $ticket, Model\TicketUpdate $update)
+    {
+        return $this->getResource('doUpdateTicket', func_get_args(), array(
+            'cache_key'      => 'ticket_' . $ticket->getId(),
+            'cache_lifetime' => $this->cacheLifetime['ticket'],
+            'cache_no_get'   => true,
+        ));
+    }
+
+    /**
+     * Update a ticket from TicketUpdate data
+     *
+     * @param \CleverAge\Orchestrator\Ticketing\Model\Ticket $ticket
+     * @param \CleverAge\Orchestrator\Ticketing\Model\TicketUpdate $update
+     * @return \CleverAge\Orchestrator\Ticketing\Model\Ticket
+     */
+    abstract protected function doUpdateTicket(Model\Ticket $ticket, Model\TicketUpdate $update);
+
+    /**
      * @param CleverAge\Orchestrator\Request\Request                $request
      * @return array<CleverAge\Orchestrator\Ticketing\Model\Ticket>
      */
