@@ -6,11 +6,16 @@ use CleverAge\Trac\Model\Ticket;
 use CleverAge\Trac\Model\Milestone;
 use CleverAge\Trac\TracApi;
 use CleverAge\Orchestrator\Ticketing\Model;
+use CleverAge\Orchestrator\Ticketing\ConverterInterface;
 
-class Converters
+class Converter implements ConverterInterface
 {
-    public static function convertTicketFromTrac(Ticket $ticket)
+    public function convertTicketFromApi($ticket)
     {
+        if (!$ticket instanceof Ticket) {
+            return null;
+        }
+
         $t = new Model\Ticket();
         $t
             ->setRaw($ticket)
@@ -41,8 +46,12 @@ class Converters
         return $t;
     }
 
-    public static function convertMilestoneFromTrac(Milestone $milestone)
+    public function convertMilestoneFromApi($milestone)
     {
+        if (!$milestone instanceof Milestone) {
+            return null;
+        }
+
         $m = new Model\Milestone();
         $m
             ->setCompletedAt($milestone->get('completed') instanceof \DateTime ? $milestone->get('completed') : null)

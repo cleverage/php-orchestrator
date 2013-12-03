@@ -7,6 +7,7 @@ use Gitlab\Exception\RuntimeException;
 use CleverAge\Orchestrator\Model\Urlisable;
 use CleverAge\Orchestrator\Sources\CachedSource;
 use CleverAge\Orchestrator\Sources\Model;
+use CleverAge\Orchestrator\Sources\ConverterInterface;
 
 class Gitlab extends CachedSource
 {
@@ -15,9 +16,15 @@ class Gitlab extends CachedSource
      */
     protected $client;
 
-    public function __construct(Client $client)
+    /**
+     * @var \CleverAge\Orchestrator\Sources\ConverterInterface
+     */
+    protected $converter;
+
+    public function __construct(Client $client, ConverterInterface $converter = null)
     {
         $this->client = $client;
+        $this->converter = $converter ?: new Converter();
     }
 
     public function getName()
@@ -56,7 +63,7 @@ class Gitlab extends CachedSource
         $projects = array();
 
         foreach ($projectsApi as $projectApi) {
-            $project = Converters::convertProjectFromApi($projectApi);
+            $project = $this->converter->convertProjectFromApi($projectApi);
             if (in_array($project->getId(), $ids)) {
                 $projects[] = $project;
             }
@@ -72,7 +79,7 @@ class Gitlab extends CachedSource
     {
         $projectApi = $this->client->api('projects')->show($id);
 
-        return empty($projectApi) ? null : Converters::convertProjectFromApi($projectApi);
+        return empty($projectApi) ? null : $this->converter->convertProjectFromApi($projectApi);
     }
 
     /**
@@ -89,7 +96,7 @@ class Gitlab extends CachedSource
             throw $e;
         }
 
-        $branch = Converters::convertBranchFromApi($branchApi);
+        $branch = $this->converter->convertBranchFromApi($branchApi);
         $branch->setProject($project);
 
         return $branch;
@@ -107,7 +114,7 @@ class Gitlab extends CachedSource
         $mrs = array();
 
         foreach ($mrsApi as $mrApi) {
-            $mr = Converters::convertMergeRequestFromApi($mrApi);
+            $mr = $this->converter->convertMergeRequestFromApi($mrApi);
             $mr->setProject($project);
             $mrs[] = $mr;
         }

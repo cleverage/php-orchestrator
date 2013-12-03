@@ -7,6 +7,7 @@ use CleverAge\Orchestrator\Model\Urlisable;
 use CleverAge\Orchestrator\Ticketing\CachedTicketing;
 use CleverAge\Orchestrator\Ticketing\Model;
 use CleverAge\Trac\TracApi;
+use CleverAge\Orchestrator\Ticketing\ConverterInterface;
 
 class Trac extends CachedTicketing
 {
@@ -15,9 +16,15 @@ class Trac extends CachedTicketing
      */
     protected $trac;
 
-    public function __construct(TracApi $trac)
+    /**
+     * @var \CleverAge\Orchestrator\Ticketing\ConverterInterface
+     */
+    protected $converter;
+
+    public function __construct(TracApi $trac, ConverterInterface $converter = null)
     {
         $this->trac = $trac;
+        $this->converter = $converter ?: new Converter();
     }
 
     public function getName()
@@ -74,7 +81,7 @@ class Trac extends CachedTicketing
         }
         $ticketApi = $this->trac->getTicketById($id);
 
-        return Converters::convertTicketFromTrac($ticketApi);
+        return $this->converter->convertTicketFromApi($ticketApi);
     }
 
     protected function doUpdateTicket(Model\Ticket $ticket, Model\TicketUpdate $update)
@@ -88,7 +95,7 @@ class Trac extends CachedTicketing
             $update->getUpdatedAt()
         );
 
-        return Converters::convertTicketFromTrac($ticketApi);
+        return $this->converter->convertTicketFromApi($ticketApi);
     }
 
     public function getTicketList(Request $request)
@@ -113,7 +120,7 @@ class Trac extends CachedTicketing
         $tickets = array();
 
         foreach ($ticketsApi as $ticketApi) {
-            $tickets[] = Converters::convertTicketFromTrac($ticketApi);
+            $tickets[] = $this->converter->convertTicketFromApi($ticketApi);
         }
 
         return $tickets;
@@ -125,7 +132,7 @@ class Trac extends CachedTicketing
         $milestones = array();
 
         foreach ($milestonesApi as $milestoneApi) {
-            $milestones[] = Converters::convertMilestoneFromTrac($milestoneApi);
+            $milestones[] = $this->converter->convertMilestoneFromApi($milestoneApi);
         }
 
         return $milestones;

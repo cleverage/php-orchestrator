@@ -3,11 +3,16 @@
 namespace CleverAge\Orchestrator\Sources\Gitlab;
 
 use CleverAge\Orchestrator\Sources\Model;
+use CleverAge\Orchestrator\Sources\ConverterInterface;
 
-class Converters
+class Converter implements ConverterInterface
 {
-    public static function convertProjectFromApi(array $projectApi)
+    public function convertProjectFromApi($projectApi)
     {
+        if (!is_array($projectApi)) {
+            return null;
+        }
+
         $p = new Model\Project();
         $p
             ->setRaw($projectApi)
@@ -21,31 +26,43 @@ class Converters
         return $p;
     }
 
-    public static function convertBranchFromApi(array $branchApi)
+    public function convertBranchFromApi($branchApi)
     {
+        if (!is_array($branchApi)) {
+            return null;
+        }
+
         $b = new Model\Branch();
         $b
             ->setRaw($branchApi)
             ->setName($branchApi['name'])
-            ->setLastCommit(self::convertCommitFromApi($branchApi['commit']))
+            ->setLastCommit($this->convertCommitFromApi($branchApi['commit']))
         ;
         return $b;
     }
 
-    public static function convertCommitFromApi(array $commitApi)
+    public function convertCommitFromApi($commitApi)
     {
+        if (!is_array($commitApi)) {
+            return null;
+        }
+
         $c = new Model\Commit();
         $c
             ->setId($commitApi['id'])
             ->setMessage($commitApi['message'])
-            ->setAuthor(self::convertCommitAuthorFromApi($commitApi['author']))
+            ->setAuthor($this->convertCommitAuthorFromApi($commitApi['author']))
             ->setAuthoredAt(new \DateTime($commitApi['authored_date']))
         ;
         return $c;
     }
 
-    public static function convertCommitAuthorFromApi(array $commitAuthorApi)
+    public function convertCommitAuthorFromApi($commitAuthorApi)
     {
+        if (!is_array($commitAuthorApi)) {
+            return null;
+        }
+
         $a = new Model\CommitAuthor();
         $a
             ->setName($commitAuthorApi['name'])
@@ -54,8 +71,12 @@ class Converters
         return $a;
     }
 
-    public static function convertMergeRequestFromApi(array $mrApi)
+    public function convertMergeRequestFromApi($mrApi)
     {
+        if (!is_array($mrApi)) {
+            return null;
+        }
+
         $mr = new Model\MergeRequest();
 
         $state = Model\MergeRequest::STATE_OPENED;
@@ -72,15 +93,22 @@ class Converters
             ->setSourceBranchName($mrApi['source_branch'])
             ->setTargetBranchName($mrApi['target_branch'])
             ->setState($state)
-            ->setAuthor(self::convertMergeRequestUserFromApi($mrApi['author']))
-            ->setAssignee(self::convertMergeRequestUserFromApi($mrApi['assignee']))
+            ->setAuthor($this->convertMergeRequestUserFromApi($mrApi['author']))
         ;
+
+        if (!empty($mrApi['assignee'])) {
+            $mr->setAssignee($this->convertMergeRequestUserFromApi($mrApi['assignee']));
+        }
 
         return $mr;
     }
 
-    public static function convertMergeRequestUserFromApi(array $user)
+    public function convertMergeRequestUserFromApi($user)
     {
+        if (!is_array($user)) {
+            return null;
+        }
+
         $u = new Model\MergeRequestUser();
         $u
             ->setId($user['id'])

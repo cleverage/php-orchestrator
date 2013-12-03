@@ -12,7 +12,7 @@ abstract class CachedSource extends CachedService implements SourceInterface
     protected $cacheLifetime = array(
         'project'       => 86400,
         'branch'        => 300,
-        'merge_requst'  => 60,
+        'mergerequest'  => 60,
     );
 
     /**

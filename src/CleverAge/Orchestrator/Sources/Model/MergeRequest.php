@@ -143,4 +143,19 @@ class MergeRequest extends RawData implements Urlisable
 
         return $this;
     }
+
+    public function isOpened()
+    {
+        return self::STATE_OPENED === $this->getState();
+    }
+
+    public function isClosed()
+    {
+        return self::STATE_CLOSED === $this->getState();
+    }
+
+    public function isMerged()
+    {
+        return self::STATE_MERGED === $this->getState();
+    }
 }
