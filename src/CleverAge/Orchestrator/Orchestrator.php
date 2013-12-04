@@ -82,7 +82,11 @@ class Orchestrator
         return new Feature($ticket, $sources);
     }
 
-    public function getTicketWithSources(Request $request)
+    /**
+     * @param \CleverAge\Orchestrator\Request\Request $request
+     * @return array<\CleverAge\Orchestrator\Feature>
+     */
+    public function getFeatures(Request $request)
     {
         $tickets = $this->ticketing->getTicketList($request);
 
@@ -95,6 +99,29 @@ class Orchestrator
         return $features;
     }
 
+    /**
+     * @param \CleverAge\Orchestrator\Request\Request $request
+     * @return \CleverAge\Orchestrator\Feature|null
+     */
+    public function getFeature(Request $request)
+    {
+        $ticket = null;
+
+        if ($request->getTicketId()) {
+            $ticket = $this->ticketing->getTicketById($request->getTicketId());
+        }
+
+        if ($ticket) {
+            return $this->buildFeature($ticket, $request);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param boolean|null $completed
+     * @return array<CleverAge\Orchestrator\Ticketing\Model\Milestone>
+     */
     public function getMilestones($completed = null)
     {
         return $this->ticketing->getMilestones($completed);

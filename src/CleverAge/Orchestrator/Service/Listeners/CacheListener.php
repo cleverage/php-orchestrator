@@ -14,13 +14,28 @@ class CacheListener
      */
     protected $cache;
 
-    public function __construct(Cache $cache)
+    /**
+     * @var boolean $enabled
+     */
+    protected $enabled;
+
+    public function __construct(Cache $cache, $enabled = true)
     {
         $this->cache = $cache;
+        $this->setEnabled($enabled);
+    }
+
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = (bool) $enabled;
     }
 
     public function onServicePreFetch(ServiceEvent $event)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $params = $event->getParameters();
 
         if (!isset($params['cache_no_get']) || !$params['cache_no_get']) {
@@ -34,6 +49,10 @@ class CacheListener
 
     public function onServicePostFetch(ServiceEvent $event)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $params = $event->getParameters();
         $cacheKey = isset($params['cache_key']) ? $event->getService()->getName().'_'.$params['cache_key'] : false;
         $lifetime = isset($params['cache_lifetime']) ? $params['cache_lifetime'] : self::DEFAULT_LIFETIME;

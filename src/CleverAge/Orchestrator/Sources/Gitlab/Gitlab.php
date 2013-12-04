@@ -34,7 +34,7 @@ class Gitlab extends CachedSource
 
     protected function getPage($limit, $offset)
     {
-        return ((int) $offset/$limit)+1;
+        return $limit ? ((int) $offset/$limit)+1 : 1;
     }
 
     /**
@@ -85,10 +85,10 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    protected function doGetBranch(Model\Project $project, $branch)
+    protected function doGetBranch(Model\Project $project, $id)
     {
         try {
-            $branchApi = $this->client->api('repositories')->branch($project->getId(), $branch);
+            $branchApi = $this->client->api('repositories')->branch($project->getId(), $id);
         } catch (RuntimeException $e) {
             if ($e->getCode() == 404) {
                 return null;
@@ -120,5 +120,66 @@ class Gitlab extends CachedSource
         }
 
         return $mrs;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function doPostMergeRequest(Model\MergeRequest $mergeRequest)
+    {
+        $mrApi = $this->client->api('merge_requests')->create(
+            $mergeRequest->getProject()->getId(),
+            $mergeRequest->getSourceBranchName(),
+            $mergeRequest->getTargetBranchName(),
+            $mergeRequest->getName(),
+            $mergeRequest->getAssignee()->getId()
+        );
+
+        $mr = $this->converter->convertMergeRequestFromApi($mrApi);
+        $mr
+            ->setProject($mergeRequest->getProject())
+            ->setSourceBranch($mergeRequest->getSourceBranch())
+            ->setTargetBranch($mergeRequest->getTargetBranch())
+        ;
+
+        return $mr;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function doGetUsers($limit = 20, $offset = 0)
+    {
+        $page = $this->getPage($limit, $offset);
+
+        $usersApi = $this->client->api('users')->all($page, $limit);
+
+        $users = array();
+
+        foreach ($usersApi as $userApi) {
+            $user = $this->converter->convertUserFromApi($userApi);
+            $users[] = $user;
+        }
+
+        return $users;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function doGetUserByUsername($username, $active = null)
+    {
+        $users = $this->getUsers(0);
+
+        foreach ($users as $user) {
+            if ($user->getUsername() == $username) {
+                if (!is_bool($active) || $active == $user->getIsEnabled()) {
+                    return $user;
+                }
+                break;
+            }
+        }
+
+        return null;
     }
 }

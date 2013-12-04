@@ -18,6 +18,29 @@ abstract class CachedTicketing extends CachedService implements TicketingInterfa
     protected $tickets = array();
 
     /**
+     * Use local cache to fetch and store results
+     *
+     * @param array<\CleverAge\Orchestrator\Ticketing\Ticket>|\CleverAge\Orchestrator\Ticketing\Ticket $tickets
+     * @return mixed
+     */
+    protected function localCacheTicket($tickets)
+    {
+        if (is_array($tickets)) {
+            foreach ($tickets as $k => $ticket) {
+                if (isset($this->tickets[$ticket->getId()])) {
+                    $tickets[$k] = $this->tickets[$ticket->getId()];
+                } else {
+                    $this->tickets[$ticket->getId()] = $tickets[$k];
+                }
+            }
+        } elseif ($tickets instanceof Model\Ticket) {
+            $this->tickets[$tickets->getId()] = $tickets;
+        }
+
+        return $tickets;
+    }
+
+    /**
      * @param string $id
      * @return CleverAge\Orchestrator\Ticketing\Model\Ticket
      */
@@ -32,9 +55,7 @@ abstract class CachedTicketing extends CachedService implements TicketingInterfa
             'cache_lifetime' => $this->cacheLifetime['ticket']
         ));
 
-        $this->tickets[$id] = $ticket;
-
-        return $ticket;
+        return $this->localCacheTicket($ticket);
     }
 
     /**
@@ -79,15 +100,7 @@ abstract class CachedTicketing extends CachedService implements TicketingInterfa
             'cache_lifetime' => $this->cacheLifetime['ticket']
         ));
 
-        foreach ($tickets as $k => $ticket) {
-            if (isset($this->tickets[$ticket->getId()])) {
-                $tickets[$k] = $this->tickets[$ticket->getId()];
-            } else {
-                $this->tickets[$ticket->getId()] = $tickets[$k];
-            }
-        }
-
-        return $tickets;
+        return $this->localCacheTicket($tickets);
     }
 
     /**

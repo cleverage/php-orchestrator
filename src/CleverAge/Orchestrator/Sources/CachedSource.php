@@ -13,7 +13,10 @@ abstract class CachedSource extends CachedService implements SourceInterface
         'project'       => 86400,
         'branch'        => 300,
         'mergerequest'  => 60,
+        'user'          => 86400,
     );
+
+    // ------ PROJECTS ------ \\
 
     /**
      * @return array<Model\Project>
@@ -50,6 +53,9 @@ abstract class CachedSource extends CachedService implements SourceInterface
      */
     abstract protected function doGetProject($id);
 
+
+    // ------ BRANCHES ------ \\
+
     /**
      * @param Model\Project $project
      * @param string        $id
@@ -69,6 +75,9 @@ abstract class CachedSource extends CachedService implements SourceInterface
      * @return Model\Branch
      */
     abstract protected function doGetBranch(Model\Project $project, $id);
+
+
+    // ------ MERGE REQUESTS ------ \\
 
     /**
      * @param Model\Project $project
@@ -91,6 +100,68 @@ abstract class CachedSource extends CachedService implements SourceInterface
      * @return array<Model\MergeRequest>
      */
     abstract protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0);
+
+    /**
+     * @param Model\MergeRequest $mergeRequest
+     * @return Model\MergeRequest
+     */
+    public function postMergeRequest(Model\MergeRequest $mergeRequest)
+    {
+        $sourceBranchName = $mergeRequest->getSourceBranchName();
+        $targetBranchName = $mergeRequest->getTargetBranchName();
+
+        return $this->getResource('doPostMergeRequest', func_get_args(), array(
+            'cache_key' => 'mergerequest_'.$mergeRequest->getProject()->getId().'_'.$sourceBranchName.'_'.$targetBranchName,
+            'cache_lifetime' => $this->cacheLifetime['mergerequest']
+        ));
+    }
+
+    abstract protected function doPostMergeRequest(Model\MergeRequest $mergeRequest);
+
+    // ------ USERS ------ \\
+
+    /**
+     * @param integer       $page
+     * @param integer       $perPage
+     * @return array<Model\User>
+     */
+    public function getUsers($limit = 20, $offset = 0)
+    {
+        return $this->getResource('doGetUsers', func_get_args(), array(
+            'cache_key' => 'users_'.$limit.'_'.$offset,
+            'cache_lifetime' => $this->cacheLifetime['user']
+        ));
+    }
+
+    /**
+     * @param integer       $page
+     * @param integer       $perPage
+     * @return array<Model\User>
+     */
+    abstract protected function doGetUsers($limit = 20, $offset = 0);
+
+    /**
+     * @param string       $username
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User
+     */
+    public function getUserByUsername($username, $active = null)
+    {
+        return $this->getResource('doGetUserByUsername', func_get_args(), array(
+            'cache_key' => 'user_'.$username,
+            'cache_lifetime' => $this->cacheLifetime['user']
+        ));
+    }
+
+    /**
+     * @param string       $username
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User|null
+     */
+    abstract protected function doGetUserByUsername($username, $active = null);
+
+
+    // ------ TOOLS ------ \\
 
     /**
      * @inheritdoc

@@ -8,7 +8,7 @@ class Commit
     protected $id;
     protected $message;
     /**
-     * @var CommitAuthor
+     * @var CommitAuthorInterface
      */
     protected $author;
 
@@ -27,6 +27,9 @@ class Commit
         return $this->message;
     }
 
+    /**
+     * @return CommitAuthorInterface
+     */
     public function getAuthor()
     {
         return $this->author;
@@ -49,7 +52,7 @@ class Commit
         return $this;
     }
 
-    public function setAuthor(CommitAuthor $author)
+    public function setAuthor(CommitAuthorInterface $author)
     {
         $this->author = $author;
         return $this;

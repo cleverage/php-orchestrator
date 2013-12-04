@@ -147,7 +147,7 @@ class Trac extends CachedTicketing
 
                 $blocking = array();
                 foreach ($ticket->getBlocking() as $id) {
-                    if (!empty($id)) {
+                    if (is_scalar($id) && !empty($id)) {
                         $blocking[] = $this->getPopulatedDependenciesById($id, $populated);
                     }
                 }
@@ -155,7 +155,7 @@ class Trac extends CachedTicketing
 
                 $blockedBy = array();
                 foreach ($ticket->getBlockedBy() as $id) {
-                    if (!empty($id)) {
+                    if (is_scalar($id) && !empty($id)) {
                         $blockedBy[] = $this->getPopulatedDependenciesById($id, $populated);
                     }
                 }

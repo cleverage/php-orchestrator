@@ -41,4 +41,18 @@ interface SourceInterface
      * @return array<\CleverAge\Orchestrator\Sources\Model\MergeRequest>
      */
     public function getMergeRequests(Model\Project $project, $page = 1, $perPage = 20);
+
+    /**
+     * @param integer       $page
+     * @param integer       $perPage
+     * @return array<Model\User>
+     */
+    public function getUsers($limit = 20, $offset = 0);
+
+    /**
+     * @param string       $username
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User
+     */
+    public function getUserByUsername($username, $active = null);
 }

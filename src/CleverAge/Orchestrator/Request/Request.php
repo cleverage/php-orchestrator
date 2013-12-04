@@ -18,6 +18,11 @@ class Request
     protected $milestone;
 
     /**
+     * @var mixed
+     */
+    protected $ticketId;
+
+    /**
      * @var int
      */
     protected $limit = 20;
@@ -31,6 +36,11 @@ class Request
      * @var \Closure
      */
     protected $sourceIdClosure;
+
+    public function getTicketId()
+    {
+        return $this->ticketId;
+    }
 
     public function getStatus()
     {
@@ -67,6 +77,12 @@ class Request
         return function (Orchestrator\Ticketing\Model\Ticket $ticket) {
             return array($ticket->getId());
         };
+    }
+
+    public function setTicketId($ticketId)
+    {
+        $this->ticketId = $ticketId;
+        return $this;
     }
 
     public function setStatus($status)

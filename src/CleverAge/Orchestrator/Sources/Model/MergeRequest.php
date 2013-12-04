@@ -23,15 +23,25 @@ class MergeRequest extends RawData implements Urlisable
     protected $sourceBranchName;
     protected $targetBranchName;
     /**
-     * @var MergeRequestUser
+     * @var MergeRequestUserInterface
      */
     protected $author;
     /**
-     * @var MergeRequestUser
+     * @var MergeRequestUserInterface
      */
     protected $assignee;
 
     protected $url;
+
+    /**
+     * @var Branch
+     */
+    protected $sourceBranch;
+
+    /**
+     * @var Branch
+     */
+    protected $targetBranch;
 
     public function getId()
     {
@@ -68,11 +78,17 @@ class MergeRequest extends RawData implements Urlisable
         return $this->targetBranchName;
     }
 
+    /**
+     * @return MergeRequestUserInterface
+     */
     public function getAuthor()
     {
         return $this->author;
     }
 
+    /**
+     * @return MergeRequestUserInterface
+     */
     public function getAssignee()
     {
         return $this->assignee;
@@ -81,6 +97,22 @@ class MergeRequest extends RawData implements Urlisable
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * @return MergeRequestUserInterface
+     */
+    public function getSourceBranch()
+    {
+        return $this->sourceBranch;
+    }
+
+    /**
+     * @return MergeRequestUserInterface
+     */
+    public function getTargetBranch()
+    {
+        return $this->targetBranch;
     }
 
     public function setId($id)
@@ -125,13 +157,27 @@ class MergeRequest extends RawData implements Urlisable
         return $this;
     }
 
-    public function setAuthor(MergeRequestUser $author)
+    public function setSourceBranch(Branch $sourceBranch)
+    {
+        $this->sourceBranch = $sourceBranch;
+        $this->setSourceBranchName($sourceBranch->getName());
+        return $this;
+    }
+
+    public function setTargetBranch(Branch $targetBranch)
+    {
+        $this->targetBranch = $targetBranch;
+        $this->setTargetBranchName($targetBranch->getName());
+        return $this;
+    }
+
+    public function setAuthor(MergeRequestUserInterface $author)
     {
         $this->author = $author;
         return $this;
     }
 
-    public function setAssignee(MergeRequestUser $assignee)
+    public function setAssignee(MergeRequestUserInterface $assignee)
     {
         $this->assignee = $assignee;
         return $this;

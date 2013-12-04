@@ -63,7 +63,7 @@ class Converter implements ConverterInterface
             return null;
         }
 
-        $a = new Model\CommitAuthor();
+        $a = new Model\User();
         $a
             ->setName($commitAuthorApi['name'])
             ->setEmail($commitAuthorApi['email'])
@@ -109,13 +109,34 @@ class Converter implements ConverterInterface
             return null;
         }
 
-        $u = new Model\MergeRequestUser();
+        $u = new Model\User();
         $u
             ->setId($user['id'])
             ->setUsername($user['username'])
             ->setName($user['name'])
             ->setEmail($user['email'])
             ->setCreatedAt(new \DateTime($user['created_at']))
+        ;
+        return $u;
+    }
+
+    public function convertUserFromApi($userApi)
+    {
+        if (!is_array($userApi)) {
+            return null;
+        }
+
+        $u = new Model\User();
+        $u
+            ->setId($userApi['id'])
+            ->setUsername($userApi['username'])
+            ->setName($userApi['name'])
+            ->setEmail($userApi['email'])
+            ->setCreatedAt(new \DateTime($userApi['created_at']))
+            ->setIsEnabled($userApi['state'] == 'active')
+            ->setSkype($userApi['skype'])
+            ->setLinkedin($userApi['linkedin'])
+            ->setTwitter($userApi['twitter'])
         ;
         return $u;
     }
