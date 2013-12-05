@@ -18,7 +18,6 @@ class Ticket extends RawData implements Urlisable
     protected $priority;
     protected $url;
     protected $closed;
-    protected $providerSpecific;
 
     /**
      * @var array
@@ -88,14 +87,6 @@ class Ticket extends RawData implements Urlisable
     public function getUrl()
     {
         return $this->url;
-    }
-
-    public function getProviderSpecific($attribute = null)
-    {
-        if (!is_null($attribute) && is_array($this->providerSpecific) && isset($this->providerSpecific[$attribute])) {
-            return $this->providerSpecific[$attribute];
-        }
-        return $this->providerSpecific;
     }
 
     public function isClosed()
@@ -183,12 +174,6 @@ class Ticket extends RawData implements Urlisable
     public function setIsClosed($closed)
     {
         $this->closed = $closed;
-        return $this;
-    }
-
-    public function setProviderSpecific(array $providerSpecific)
-    {
-        $this->providerSpecific = $providerSpecific;
         return $this;
     }
 
