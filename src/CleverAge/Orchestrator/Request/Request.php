@@ -74,7 +74,7 @@ class Request
             return $this->sourceIdClosure;
         }
 
-        return function (Orchestrator\Ticketing\Model\Ticket $ticket) {
+        return function (\CleverAge\Orchestrator\Ticketing\Model\Ticket $ticket) {
             return array($ticket->getId());
         };
     }
