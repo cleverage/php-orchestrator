@@ -43,6 +43,12 @@ interface SourceInterface
     public function getMergeRequests(Model\Project $project, $page = 1, $perPage = 20);
 
     /**
+     * @param \CleverAge\Orchestrator\Sources\Model\MergeRequest $mergeRequest
+     * @return \CleverAge\Orchestrator\Sources\Model\MergeRequest
+     */
+    public function postMergeRequest(Model\MergeRequest $mergeRequest);
+
+    /**
      * @param integer       $page
      * @param integer       $perPage
      * @return array<Model\User>
