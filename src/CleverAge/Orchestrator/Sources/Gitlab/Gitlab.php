@@ -32,6 +32,14 @@ class Gitlab extends CachedSource
         return 'gitlab';
     }
 
+    /**
+     * @return \Gitlab\Client
+     */
+    protected function getClient()
+    {
+        return $this->client;
+    }
+
     protected function getPage($limit, $offset)
     {
         return $limit ? ((int) $offset/$limit)+1 : 1;
@@ -50,7 +58,7 @@ class Gitlab extends CachedSource
             return $object->getProject()->getUrl().'/merge_requests/'.$object->getId();
         }
 
-        return substr($this->client->getBaseUrl(), 0, strpos($this->client->getBaseUrl(), '/api/')).'/';
+        return substr($this->getClient()->getBaseUrl(), 0, strpos($this->getClient()->getBaseUrl(), '/api/')).'/';
     }
 
     /**
@@ -58,7 +66,7 @@ class Gitlab extends CachedSource
      */
     protected function doGetProjects(array $ids = array())
     {
-        $projectsApi = $this->client->api('projects')->all();
+        $projectsApi = $this->getClient()->api('projects')->all();
 
         $projects = array();
 
@@ -77,7 +85,7 @@ class Gitlab extends CachedSource
      */
     protected function doGetProject($id)
     {
-        $projectApi = $this->client->api('projects')->show($id);
+        $projectApi = $this->getClient()->api('projects')->show($id);
 
         return empty($projectApi) ? null : $this->converter->convertProjectFromApi($projectApi);
     }
@@ -88,7 +96,7 @@ class Gitlab extends CachedSource
     protected function doGetBranch(Model\Project $project, $id)
     {
         try {
-            $branchApi = $this->client->api('repositories')->branch($project->getId(), $id);
+            $branchApi = $this->getClient()->api('repositories')->branch($project->getId(), $id);
         } catch (RuntimeException $e) {
             if ($e->getCode() == 404) {
                 return null;
@@ -109,7 +117,7 @@ class Gitlab extends CachedSource
     {
         $page = $this->getPage($limit, $offset);
 
-        $mrsApi = $this->client->api('merge_requests')->all($project->getId(), $page, $limit);
+        $mrsApi = $this->getClient()->api('merge_requests')->all($project->getId(), $page, $limit);
 
         $mrs = array();
 
@@ -127,7 +135,7 @@ class Gitlab extends CachedSource
      */
     protected function doPostMergeRequest(Model\MergeRequest $mergeRequest)
     {
-        $mrApi = $this->client->api('merge_requests')->create(
+        $mrApi = $this->getClient()->api('merge_requests')->create(
             $mergeRequest->getProject()->getId(),
             $mergeRequest->getSourceBranchName(),
             $mergeRequest->getTargetBranchName(),
@@ -152,7 +160,7 @@ class Gitlab extends CachedSource
     {
         $page = $this->getPage($limit, $offset);
 
-        $usersApi = $this->client->api('users')->all($page, $limit);
+        $usersApi = $this->getClient()->api('users')->all($page, $limit);
 
         $users = array();
 
