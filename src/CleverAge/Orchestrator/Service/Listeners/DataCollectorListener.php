@@ -52,7 +52,7 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
         if ($this->stopwatch instanceof Stopwatch) {
             $this->profiles[$event->getService()->getName()][$this->counter] = array(
                 'method'        => $event->getRequestMethod(),
-                'parameters'    => $event->getRequestParameters(),
+                'parameters'    => print_r($event->getRequestParameters(), true),
                 'duration'      => null,
                 'result_count'  => 0,
             );
