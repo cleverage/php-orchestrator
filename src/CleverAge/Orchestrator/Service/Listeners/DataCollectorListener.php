@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 use CleverAge\Orchestrator\Events\ServiceEvent;
+use CleverAge\Orchestrator\Events\ServiceErrorEvent;
 
 class DataCollectorListener extends DataCollector implements DataCollectorInterface
 {
@@ -86,6 +87,24 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
         }
     }
 
+    protected function stopProfilingFromError(ServiceErrorEvent $event)
+    {
+        if ($this->activeProfileEvent) {
+
+            $exception = $event->getOriginalException();
+
+            $this->profiles[$event->getService()->getName()][$this->counter]['error'] = array(
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
+                'class' => get_class($exception),
+            );
+
+            $this->stopProfiling($event);
+        }
+    }
+
+    // ------ EVENT CALLBACKS -----\\
+
     public function onServicePreFetch(ServiceEvent $event)
     {
         if (!$event->isResourceSet()) {
@@ -98,6 +117,11 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
         $this->stopProfiling($event);
     }
 
+    public function onServiceFetchError(ServiceErrorEvent $event)
+    {
+        $this->stopProfilingFromError($event);
+    }
+
     // ------ DATA COLLECTOR ------ \\
 
     /**
@@ -107,17 +131,23 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
     {
         $count = 0;
         $duration = 0;
+        $errors = 0;
 
         foreach ($this->profiles as $profiles) {
             $count += count($profiles);
             foreach ($profiles as $profile) {
                 $duration += $profile['duration'];
+
+                if (array_key_exists('error', $profile)) {
+                    $errors++;
+                }
             }
         }
 
         $this->data = array(
             'totalRequests' => $count,
             'totalDuration' => $duration,
+            'totalErrors'   => $errors,
             'requests'      => $this->profiles
         );
     }

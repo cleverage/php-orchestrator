@@ -5,6 +5,8 @@ namespace CleverAge\Orchestrator\Service;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use CleverAge\Orchestrator\Events\OrchestratorEvents;
 use CleverAge\Orchestrator\Events\ServiceEvent;
+use CleverAge\Orchestrator\Events\ServiceErrorEvent;
+use CleverAge\Orchestrator\Exception;
 
 abstract class Service
 {
@@ -44,18 +46,44 @@ abstract class Service
                 ->setRequestParameters($arguments)
                 ->setParameters($eventParameters)
             ;
-            $this->dispatcher->dispatch(OrchestratorEvents::SERVICE_PRE_FETCH, $event);
+            $this->dispatcher->dispatch(OrchestratorEvents::SERVICE_FETCH_PRE, $event);
 
             if ($event->isResourceSet()) {
                 return $event->getResource();
             }
         }
 
-        $resource = $this->fetchResource($method, $arguments);
+        try {
+            $resource = $this->fetchResource($method, $arguments);
 
-        if ($this->dispatcher) {
-            $event->setResource($resource);
-            $this->dispatcher->dispatch(OrchestratorEvents::SERVICE_POST_FETCH, $event);
+            if ($this->dispatcher) {
+                $event->setResource($resource);
+                $this->dispatcher->dispatch(OrchestratorEvents::SERVICE_FETCH_POST, $event);
+            }
+
+        } catch (\Exception $e) {
+            $resource = null;
+
+            if ($this->dispatcher) {
+                $errorEvent = new ServiceErrorEvent($e);
+                $errorEvent
+                    ->setService($this)
+                    ->setRequestMethod($method)
+                    ->setRequestParameters($arguments)
+                    ->setParameters($eventParameters)
+                ;
+                $this->dispatcher->dispatch(OrchestratorEvents::SERVICE_FETCH_ERROR, $errorEvent);
+
+                if ($errorEvent->isSilent()) {
+                    $e = null;
+                } else {
+                    $e = $errorEvent->getException();
+                }
+            }
+
+            if ($e) {
+                throw new Exception($e->getMessage(), 500, $e);
+            }
         }
 
         return $resource;
