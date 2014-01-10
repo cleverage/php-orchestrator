@@ -1,6 +1,8 @@
 <?php
 
-namespace CleverAge\Orchestrator\Service\Listeners;
+namespace CleverAge\Orchestrator\Service\Subscribers;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
@@ -8,10 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+use CleverAge\Orchestrator\Events\OrchestratorEvents;
 use CleverAge\Orchestrator\Events\ServiceEvent;
 use CleverAge\Orchestrator\Events\ServiceErrorEvent;
 
-class DataCollectorListener extends DataCollector implements DataCollectorInterface
+class DataCollectorSubscriber extends DataCollector implements DataCollectorInterface, EventSubscriberInterface
 {
     /**
      * @var array $profiles Profiled data
@@ -32,6 +35,15 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
      * @var Symfony\Component\Stopwatch\StopwatchEvent
      */
     protected $activeProfileEvent;
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            OrchestratorEvents::SERVICE_FETCH_PRE => array('onServicePreFetch', -255),
+            OrchestratorEvents::SERVICE_FETCH_POST => array('onServicePostFetch', 255),
+            OrchestratorEvents::SERVICE_FETCH_ERROR => array('onServiceErrorFetch', -255),
+        );
+    }
 
     /**
      * @param Symfony\Component\Stopwatch\Stopwatch $stopwatch

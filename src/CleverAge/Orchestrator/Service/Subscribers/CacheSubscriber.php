@@ -1,11 +1,14 @@
 <?php
 
-namespace CleverAge\Orchestrator\Service\Listeners;
+namespace CleverAge\Orchestrator\Service\Subscribers;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Doctrine\Common\Cache\Cache;
 use CleverAge\Orchestrator\Events\ServiceEvent;
+use CleverAge\Orchestrator\Events\OrchestratorEvents;
 
-class CacheListener
+class CacheSubscriber implements EventSubscriberInterface
 {
     const DEFAULT_LIFETIME = 3600;
 
@@ -18,6 +21,14 @@ class CacheListener
      * @var boolean $enabled
      */
     protected $enabled;
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            OrchestratorEvents::SERVICE_FETCH_PRE => array('onServicePreFetch', 255),
+            OrchestratorEvents::SERVICE_FETCH_POST => array('onServicePostFetch', -255),
+        );
+    }
 
     public function __construct(Cache $cache, $enabled = true)
     {
