@@ -190,4 +190,23 @@ class Gitlab extends CachedSource
 
         return null;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function doGetUserByEmail($email, $active = null)
+    {
+        $users = $this->getUsers(0);
+
+        foreach ($users as $user) {
+            if ($user->getEmail() == $email) {
+                if (!is_bool($active) || $active == $user->getIsEnabled()) {
+                    return $user;
+                }
+                break;
+            }
+        }
+
+        return null;
+    }
 }

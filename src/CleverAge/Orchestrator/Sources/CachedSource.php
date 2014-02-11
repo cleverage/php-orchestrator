@@ -154,6 +154,26 @@ abstract class CachedSource extends CachedService implements SourceInterface
     }
 
     /**
+     * @param string       $email
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User|null
+     */
+    abstract protected function doGetUserByEmail($email, $active = null);
+
+    /**
+     * @param string       $email
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User
+     */
+    public function getUserByEmail($email, $active = null)
+    {
+        return $this->getResource('doGetUserByEmail', func_get_args(), array(
+            'cache_key' => 'user_'.$email,
+            'cache_lifetime' => $this->cacheLifetime['user']
+        ));
+    }
+
+    /**
      * @param string       $username
      * @param boolean|null $active if boolean, get active or not user, if null, returns the user
      * @return Model\User|null

@@ -61,4 +61,11 @@ interface SourceInterface
      * @return Model\User
      */
     public function getUserByUsername($username, $active = null);
+
+    /**
+     * @param string       $email
+     * @param boolean|null $active if boolean, get active or not user, if null, returns the user
+     * @return Model\User
+     */
+    public function getUserByEmail($email, $active = null);
 }
