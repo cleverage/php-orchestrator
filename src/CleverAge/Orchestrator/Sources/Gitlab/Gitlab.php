@@ -11,6 +11,9 @@ use CleverAge\Orchestrator\Sources\ConverterInterface;
 
 class Gitlab extends CachedSource
 {
+    const PER_PAGE_MAX      = 100;
+    const PER_PAGE_DEFAULT  = 20;
+
     /**
      * @var \Gitlab\Client
      */
@@ -113,7 +116,7 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0)
+    protected function doGetMergeRequests(Model\Project $project, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
     {
         $page = $this->getPage($limit, $offset);
 
@@ -156,11 +159,11 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
-    protected function doGetUsers($limit = 20, $offset = 0)
+    protected function doGetUsers($active = null, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
     {
         $page = $this->getPage($limit, $offset);
 
-        $usersApi = $this->getClient()->api('users')->all($page, $limit);
+        $usersApi = $this->getClient()->api('users')->all($active, $page, $limit);
 
         $users = array();
 
@@ -177,7 +180,7 @@ class Gitlab extends CachedSource
      */
     protected function doGetUserByUsername($username, $active = null)
     {
-        $users = $this->getUsers(0);
+        $users = $this->getUsers($active, self::PER_PAGE_MAX);
 
         foreach ($users as $user) {
             if ($user->getUsername() == $username) {
@@ -196,7 +199,7 @@ class Gitlab extends CachedSource
      */
     protected function doGetUserByEmail($email, $active = null)
     {
-        $users = $this->getUsers(0);
+        $users = $this->getUsers($active, self::PER_PAGE_MAX);
 
         foreach ($users as $user) {
             if ($user->getEmail() == $email) {

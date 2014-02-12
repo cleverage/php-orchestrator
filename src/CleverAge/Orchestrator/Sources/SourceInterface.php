@@ -49,11 +49,12 @@ interface SourceInterface
     public function postMergeRequest(Model\MergeRequest $mergeRequest);
 
     /**
+     * @param boolean|null  $active
      * @param integer       $page
      * @param integer       $perPage
      * @return array<Model\User>
      */
-    public function getUsers($limit = 20, $offset = 0);
+    public function getUsers($active = null, $limit = 20, $offset = 0);
 
     /**
      * @param string       $username

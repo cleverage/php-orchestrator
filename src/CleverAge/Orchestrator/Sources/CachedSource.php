@@ -121,24 +121,26 @@ abstract class CachedSource extends CachedService implements SourceInterface
     // ------ USERS ------ \\
 
     /**
+     * @param boolean|null  $active
      * @param integer       $page
      * @param integer       $perPage
      * @return array<Model\User>
      */
-    public function getUsers($limit = 20, $offset = 0)
+    public function getUsers($active = null, $limit = 20, $offset = 0)
     {
         return $this->getResource('doGetUsers', func_get_args(), array(
-            'cache_key' => 'users_'.$limit.'_'.$offset,
+            'cache_key' => 'users_'.$this->convertValue($active).'_'.$limit.'_'.$offset,
             'cache_lifetime' => $this->cacheLifetime['user']
         ));
     }
 
     /**
+     * @param boolean|null  $active
      * @param integer       $page
      * @param integer       $perPage
      * @return array<Model\User>
      */
-    abstract protected function doGetUsers($limit = 20, $offset = 0);
+    abstract protected function doGetUsers($active = null, $limit = 20, $offset = 0);
 
     /**
      * @param string       $username
@@ -148,7 +150,7 @@ abstract class CachedSource extends CachedService implements SourceInterface
     public function getUserByUsername($username, $active = null)
     {
         return $this->getResource('doGetUserByUsername', func_get_args(), array(
-            'cache_key' => 'user_'.$username,
+            'cache_key' => 'user_username_'.$this->convertValue($active).'_'.$username,
             'cache_lifetime' => $this->cacheLifetime['user']
         ));
     }
@@ -168,7 +170,7 @@ abstract class CachedSource extends CachedService implements SourceInterface
     public function getUserByEmail($email, $active = null)
     {
         return $this->getResource('doGetUserByEmail', func_get_args(), array(
-            'cache_key' => 'user_'.$email,
+            'cache_key' => 'user_email_'.$this->convertValue($active).'_'.$email,
             'cache_lifetime' => $this->cacheLifetime['user']
         ));
     }

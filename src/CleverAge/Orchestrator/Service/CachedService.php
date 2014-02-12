@@ -14,4 +14,15 @@ abstract class CachedService extends Service
         $this->cacheLifetime = array_merge($this->cacheLifetime, $lifetimes);
         return $this;
     }
+
+    protected function convertValue($value)
+    {
+        if (is_null($value)) {
+            return 'null';
+        } elseif (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        } else {
+            return $value;
+        }
+    }
 }
