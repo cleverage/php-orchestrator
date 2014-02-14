@@ -10,6 +10,9 @@ use CleverAge\Orchestrator\Exception;
 
 abstract class Service
 {
+    const PER_PAGE_MAX = 100;
+    const PER_PAGE_ALL = -1;
+
     /**
      * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
@@ -95,4 +98,52 @@ abstract class Service
      * @return mixed
      */
     abstract protected function fetchResource($method, $arguments);
+
+    /**
+     * Fetch a multi-pages array results.
+     *
+     * Give a closure which takes a $limit and an $offset as parameters, must return
+     * an array.
+     *
+     * @param \Closure $fetchOnePage
+     * @param integer $limit
+     * @param integer $offset
+     * @return array
+     */
+    protected function paginate(\Closure $fetchOnePage, $limit, $offset)
+    {
+        $paginate = false;
+        $fetchAll = $limit === static::PER_PAGE_ALL;
+
+        if ($fetchAll || $limit > static::PER_PAGE_MAX) {
+            $paginate = true;
+            $loop_limit = static::PER_PAGE_MAX;
+        } else {
+            $loop_limit =  $limit;
+        }
+
+        $all = array();
+
+        do {
+            $results = $fetchOnePage($loop_limit, $offset);
+            $nbResults = count($results);
+
+            $all = array_merge($all, $results);
+            $nbAll = count($all);
+
+            // we have fetched too mutch results, have to slice to the expected count
+            if (!$fetchAll && $nbAll > $limit) {
+                $all = array_slice($all, 0, $limit);
+            }
+
+            // we have reach the end of the pool, there are less results than what we asked for
+            if ($nbResults < $loop_limit) {
+                break;
+            }
+
+            $offset += $nbResults;
+        } while($paginate || ($nbAll < $limit));
+
+        return $all;
+    }
 }

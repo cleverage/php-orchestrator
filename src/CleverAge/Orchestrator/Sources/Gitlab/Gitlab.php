@@ -118,6 +118,17 @@ class Gitlab extends CachedSource
      */
     protected function doGetMergeRequests(Model\Project $project, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
     {
+        return $this->paginate(
+            function ($slice_limit, $slice_offset) use ($project) {
+                return $this->fetchOneMergeRequestPage($project, $slice_limit, $slice_offset);
+            },
+            $limit,
+            $offset
+        );
+    }
+
+    protected function fetchOneMergeRequestPage(Model\Project $project, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
+    {
         $page = $this->getPage($limit, $offset);
 
         $mrsApi = $this->getClient()->api('merge_requests')->all($project->getId(), $page, $limit);
@@ -128,6 +139,10 @@ class Gitlab extends CachedSource
             $mr = $this->converter->convertMergeRequestFromApi($mrApi);
             $mr->setProject($project);
             $mrs[] = $mr;
+
+            if (count($mrs) == $limit) {
+                break;
+            }
         }
 
         return $mrs;
@@ -161,15 +176,29 @@ class Gitlab extends CachedSource
      */
     protected function doGetUsers($active = null, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
     {
+        return $this->paginate(
+            function ($slice_limit, $slice_offset) use ($active) {
+                return $this->fetchOneUsersPage($active, $slice_limit, $slice_offset);
+            },
+            $limit,
+            $offset
+        );
+    }
+
+    protected function fetchOneUsersPage($active = null, $limit = self::PER_PAGE_DEFAULT, $offset = 0)
+    {
+        $users = array();
         $page = $this->getPage($limit, $offset);
 
         $usersApi = $this->getClient()->api('users')->all($active, $page, $limit);
 
-        $users = array();
-
         foreach ($usersApi as $userApi) {
             $user = $this->converter->convertUserFromApi($userApi);
             $users[] = $user;
+
+            if (count($users) == $limit) {
+                break;
+            }
         }
 
         return $users;
@@ -180,10 +209,10 @@ class Gitlab extends CachedSource
      */
     protected function doGetUserByUsername($username, $active = null)
     {
-        $users = $this->getUsers($active, self::PER_PAGE_MAX);
+        $users = $this->getUsers($active, self::PER_PAGE_ALL);
 
         foreach ($users as $user) {
-            if ($user->getUsername() == $username) {
+            if ($user->getUsername() === $username) {
                 if (!is_bool($active) || $active == $user->getIsEnabled()) {
                     return $user;
                 }
@@ -199,10 +228,10 @@ class Gitlab extends CachedSource
      */
     protected function doGetUserByEmail($email, $active = null)
     {
-        $users = $this->getUsers($active, self::PER_PAGE_MAX);
+        $users = $this->getUsers($active, self::PER_PAGE_ALL);
 
         foreach ($users as $user) {
-            if ($user->getEmail() == $email) {
+            if ($user->getEmail() === $email) {
                 if (!is_bool($active) || $active == $user->getIsEnabled()) {
                     return $user;
                 }

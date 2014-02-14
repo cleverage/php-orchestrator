@@ -133,7 +133,7 @@ class Converter implements ConverterInterface
             ->setName($userApi['name'])
             ->setEmail($userApi['email'])
             ->setCreatedAt(new \DateTime($userApi['created_at']))
-            ->setIsEnabled($userApi['state'] == 'active')
+            ->setIsEnabled($userApi['state'] === 'active')
             ->setSkype($userApi['skype'])
             ->setLinkedin($userApi['linkedin'])
             ->setTwitter($userApi['twitter'])

@@ -29,7 +29,7 @@ class Converter implements ConverterInterface
             ->setOwner($ticket->get('owner'))
             ->setPriority($ticket->get('priority'))
             ->setUrl($ticket->getUrl())
-            ->setIsClosed($ticket->get('status') == TracApi::STATUS_CLOSED)
+            ->setIsClosed($ticket->get('status') === TracApi::STATUS_CLOSED)
             ->setProviderSpecific(array(
                 '_ts' => $ticket->get('_ts'),
             ))
