@@ -69,7 +69,7 @@ class Gitlab extends CachedSource
      */
     protected function doGetProjects(array $ids = array())
     {
-        $projectsApi = $this->getClient()->api('projects')->all();
+        $projectsApi = $this->getClient()->api('projects')->accessible();
 
         $projects = array();
 
