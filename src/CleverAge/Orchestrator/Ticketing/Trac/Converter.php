@@ -30,6 +30,7 @@ class Converter implements ConverterInterface
             ->setPriority($ticket->get('priority'))
             ->setUrl($ticket->getUrl())
             ->setIsClosed($ticket->get('status') === TracApi::STATUS_CLOSED)
+            ->setKeywords(explode(' ', $ticket->get('keywords')))
             ->setProviderSpecific(array(
                 '_ts' => $ticket->get('_ts'),
             ))

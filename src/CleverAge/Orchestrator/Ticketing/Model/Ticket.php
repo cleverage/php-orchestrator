@@ -18,6 +18,7 @@ class Ticket extends RawData implements Urlisable
     protected $priority;
     protected $url;
     protected $closed;
+    protected $keywords = array();
 
     /**
      * @var array
@@ -92,6 +93,11 @@ class Ticket extends RawData implements Urlisable
     public function isClosed()
     {
         return $this->closed;
+    }
+
+    public function getKeywords()
+    {
+        return $this->keywords;
     }
 
     public function isOpened()
@@ -175,6 +181,39 @@ class Ticket extends RawData implements Urlisable
     {
         $this->closed = $closed;
         return $this;
+    }
+
+    public function setKeywords(array $keywords)
+    {
+        $this->keywords = $keywords;
+        return $this;
+    }
+
+    public function addKeyword($keyword)
+    {
+        $keyword = $this->sanitizeKeyword($keyword);
+
+        if (in_array($keyword, $this->keywords)) {
+            $this->keywords[] = $keyword;
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword($keyword)
+    {
+        $keyword = $this->sanitizeKeyword($keyword);
+
+        if ($pos = array_search($keyword, $this->keywords)) {
+            unset($this->keywords[$pos]);
+        }
+
+        return $this;
+    }
+
+    protected function sanitizeKeyword($keyword)
+    {
+        return trim($keyword);
     }
 
     /**
