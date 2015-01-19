@@ -71,9 +71,14 @@ class Orchestrator
             foreach ($this->sourceProjects as $project) {
                 $sourceIds = $sourceIdClosure($ticket);
                 foreach ($sourceIds as $sourceId) {
-                    $source = $this->source->getBranch($project, $sourceId);
-                    if (!empty($source)) {
-                        $sources[] = $source;
+                    try {
+                        $source = $this->source->getBranch($project, $sourceId);
+                        if (!empty($source)) {
+                            $sources[] = $source;
+                        }
+                    } catch(\RuntimeException $e) {
+                        // probably 404, branch does not exists for project
+                        // @todo add log
                     }
                 }
             }

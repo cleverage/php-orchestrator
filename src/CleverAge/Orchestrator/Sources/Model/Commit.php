@@ -17,6 +17,16 @@ class Commit
      */
     protected $authoredAt;
 
+    /**
+     * @var CommitAuthorInterface
+     */
+    protected $committer;
+
+    /**
+     * @var \DateTime
+     */
+    protected $committedAt;
+
     public function getId()
     {
         return $this->id;
@@ -61,6 +71,18 @@ class Commit
     public function setAuthoredAt(\DateTime $authoredAt)
     {
         $this->authoredAt = $authoredAt;
+        return $this;
+    }
+
+    public function setCommitter(CommitAuthorInterface $committer)
+    {
+        $this->committer = $committer;
+        return $this;
+    }
+
+    public function setCommittedAt(\DateTime $committedAt)
+    {
+        $this->committedAt = $committedAt;
         return $this;
     }
 }

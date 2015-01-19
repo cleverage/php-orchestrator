@@ -43,6 +43,14 @@ interface SourceInterface
     public function getMergeRequests(Model\Project $project, $page = 1, $perPage = 20);
 
     /**
+     * @param  \CleverAge\Orchestrator\Sources\Model\Project $project
+     * @param  string $branchSource
+     * @param  string $branchTarget
+     * @return \CleverAge\Orchestrator\Sources\Model\MergeRequest|null
+     */
+    public function getMergeRequestBetween(Model\Project $project, $branchSource, $branchTarget);
+
+    /**
      * @param \CleverAge\Orchestrator\Sources\Model\MergeRequest $mergeRequest
      * @return \CleverAge\Orchestrator\Sources\Model\MergeRequest
      */

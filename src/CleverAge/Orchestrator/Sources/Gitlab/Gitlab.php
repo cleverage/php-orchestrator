@@ -151,6 +151,27 @@ class Gitlab extends CachedSource
     /**
      * @inheritdoc
      */
+    protected function doGetMergeRequestBetween(Model\Project $project, $branchSource, $branchTarget)
+    {
+        for ($i = 0; $i < 200; $i += self::PER_PAGE_DEFAULT) {
+            $mrs = $this->getMergeRequests($project, self::PER_PAGE_DEFAULT, $i);
+
+            foreach ($mrs as $mr) {
+                if (
+                    $mr->getSourceBranchName() == $branchSource
+                    && $mr->getTargetBranchName() == $branchTarget
+                    && $mr->isOpened()) {
+                    return $mr;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function doPostMergeRequest(Model\MergeRequest $mergeRequest)
     {
         $mrApi = $this->getClient()->api('merge_requests')->create(

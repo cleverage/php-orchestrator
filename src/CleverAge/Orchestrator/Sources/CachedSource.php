@@ -102,6 +102,28 @@ abstract class CachedSource extends CachedService implements SourceInterface
     abstract protected function doGetMergeRequests(Model\Project $project, $limit = 20, $offset = 0);
 
     /**
+     * @param  \CleverAge\Orchestrator\Sources\Model\Project $project
+     * @param  string $branchSource
+     * @param  string $branchTarget
+     * @return \CleverAge\Orchestrator\Sources\Model\MergeRequest|null
+     */
+    public function getMergeRequestBetween(Model\Project $project, $branchSource, $branchTarget)
+    {
+        return $this->getResource('doGetMergeRequestBetween', func_get_args(), array(
+            'cache_key' => 'mergerequests_'.$project->getId().'_'.$branchSource.'_'.$branchTarget,
+            'cache_lifetime' => $this->cacheLifetime['mergerequest']
+        ));
+    }
+
+    /**
+     * @param  \CleverAge\Orchestrator\Sources\Model\Project $project
+     * @param  string $branchSource
+     * @param  string $branchTarget
+     * @return \CleverAge\Orchestrator\Sources\Model\MergeRequest|null
+     */
+    abstract protected function doGetMergeRequestBetween(Model\Project $project, $branchSource, $branchTarget);
+
+    /**
      * @param Model\MergeRequest $mergeRequest
      * @return Model\MergeRequest
      */

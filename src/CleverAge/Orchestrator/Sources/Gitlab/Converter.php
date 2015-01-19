@@ -51,9 +51,24 @@ class Converter implements ConverterInterface
         $c
             ->setId($commitApi['id'])
             ->setMessage($commitApi['message'])
-            ->setAuthor($this->convertCommitAuthorFromApi($commitApi['author']))
             ->setAuthoredAt(new \DateTime($commitApi['authored_date']))
+            ->setCommittedAt(new \DateTime($commitApi['committed_date']))
         ;
+
+        if (isset($commitApi['author_name'])) {
+            $c->setAuthor($this->convertCommitAuthorFromApi([
+                'name' => $commitApi['author_name'],
+                'email' => $commitApi['author_email'],
+            ]));
+        }
+
+        if (isset($commitApi['committer_name'])) {
+            $c->setCommitter($this->convertCommitAuthorFromApi([
+                'name' => $commitApi['committer_name'],
+                'email' => $commitApi['committer_email'],
+            ]));
+        }
+
         return $c;
     }
 
@@ -114,9 +129,16 @@ class Converter implements ConverterInterface
             ->setId($user['id'])
             ->setUsername($user['username'])
             ->setName($user['name'])
-            ->setEmail($user['email'])
-            ->setCreatedAt(new \DateTime($user['created_at']))
         ;
+
+        if (array_key_exists('created_at', $user)) {
+            $u->setCreatedAt(new \DateTime($user['created_at']));
+        }
+
+        if (array_key_exists('email', $user)) {
+            $u->setEmail($user['email']);
+        }
+
         return $u;
     }
 
@@ -131,13 +153,20 @@ class Converter implements ConverterInterface
             ->setId($userApi['id'])
             ->setUsername($userApi['username'])
             ->setName($userApi['name'])
-            ->setEmail($userApi['email'])
-            ->setCreatedAt(new \DateTime($userApi['created_at']))
             ->setIsEnabled($userApi['state'] === 'active')
-            ->setSkype($userApi['skype'])
-            ->setLinkedin($userApi['linkedin'])
-            ->setTwitter($userApi['twitter'])
         ;
+
+        // for admins
+        if (array_key_exists('email', $userApi)) {
+            $u
+                ->setCreatedAt(new \DateTime($userApi['created_at']))
+                ->setEmail($userApi['email'])
+                ->setSkype($userApi['skype'])
+                ->setLinkedin($userApi['linkedin'])
+                ->setTwitter($userApi['twitter'])
+            ;
+        }
+
         return $u;
     }
 }
