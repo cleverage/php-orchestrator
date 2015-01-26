@@ -53,6 +53,7 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
             $this->profiles[$event->getService()->getName()][$this->counter] = array(
                 'method'        => $event->getRequestMethod(),
                 'parameters'    => print_r($event->getRequestParameters(), true),
+                'results'       => null,
                 'duration'      => null,
                 'result_count'  => 0,
             );
@@ -80,6 +81,7 @@ class DataCollectorListener extends DataCollector implements DataCollectorInterf
 
             $this->profiles[$event->getService()->getName()][$this->counter]['duration'] = $this->activeProfileEvent->getDuration();
             $this->profiles[$event->getService()->getName()][$this->counter]['result_count'] = $count;
+            $this->profiles[$event->getService()->getName()][$this->counter]['result'] = print_r($result, true);
 
             $this->counter++;
 
